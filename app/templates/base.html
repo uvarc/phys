@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    {% if title %}
+    <title>{{ title }}</title>
+    {% else %}
+    <title>Some Physics Project</title>
+    {% endif %}
+    <!<link rel="shortcut icon" href="{{ url_for('static', filename='bart_icon.png') }}">
+
+    <!-- Bootstrap core CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Custom styles for this template -->
+    <!<link href="{{ url_for('static', filename='sticky-footer-navbar.css') }}" rel="stylesheet">
+  </head>
+  <body class="bg-light">
+  {% include "header.html" %}
+    <div class="container">
+      {% block content %}{% endblock %}
+      {% include "footer.html" %}
+    </div>
+  </body>
+</html>

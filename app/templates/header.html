@@ -1,0 +1,43 @@
+{% block header %}
+  <header>
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+      <a class="navbar-brand" href="/">Some Physics Project</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav mr-auto">
+          <!-- Home -->
+          <li class="nav-item active">
+            <a class="nav-link" href="/">Home</a>
+          </li>
+
+          <!-- Result -->
+          <li class="nav-item active">
+            <form class="nav-item active" id="navbarForm" method=post enctype=multipart/form-data>
+                <input class="form-control" type="hidden" id="navbar_input" name="navbar_button" value="" />
+                <a class="nav-link" href="{{ url_for('result') }}" onclick="navbar_pop()">Result</a>
+            </form>
+          </li>
+
+          <!-- Help -->
+          <li class="nav-item active">
+            <a class="nav-link" href="{{ url_for('help') }}">Help</a>
+          </li>
+
+          <!-- Contact -->
+          <li class="nav-item active">
+              <a class="nav-link" target="_new" href="{{ url_for('contact') }}">Contact</a>
+            </li>
+          
+          <!-- Physlab -->
+          <li class="nav-item">
+            <a class="nav-link" target="_new" href="http://faculty.virginia.edu/">Physlab</a>
+          </li>
+
+        </ul>
+      </div>
+    </nav>
+  </header>
+{% endblock %}
