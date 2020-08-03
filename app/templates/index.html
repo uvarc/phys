@@ -1,9 +1,51 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Some Physics Project</h1>
-    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+<h1>Femtography Plotter</h1>
+Generate femtography plots below.
 
-    <hr>
-    <h2>Run here</h2>
+<hr>
+<h2>Run here</h2>
+<div class="formwrapper">
+    <h3 class="title">Input parameters</h3>
+    <form method="POST" action="/">
+        <div class="form-field">{{ form.csv.label }} {{ form.csv(size=20) }}
+            {% if form.csv.errors %}
+                <ul class="errors">
+                    {% for error in form.csv.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        <div class="form-field">{{ form.xbj.label }} {{ form.xbj }}
+            {% if form.xbj.errors %}
+                <ul class="errors">
+                    {% for error in form.xbj.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        <div class="form-field">{{ form.t.label }} {{ form.t }}
+            {% if form.t.errors %}
+                <ul class="errors">
+                    {% for error in form.t.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        <div class="form-field">{{ form.q2.label }} {{ form.q2 }}
+            {% if form.q2.errors %}
+                <ul class="errors">
+                    {% for error in form.q2.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        {{ form.submit }}
+    </form>
+</div>
 {% endblock %}
