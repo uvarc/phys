@@ -1,34 +1,36 @@
-<!doctype html>
-<html lang="en">
-<head>
-    {% if title %}
-        <title>{{ title }}</title>
-    {% else %}
-        <title>Some Physics Project</title>
-    {% endif %}
-    <!<link rel="shortcut icon" href="{{ url_for('static', filename='bart_icon.png') }}">
-</head>
+{% extends "base.html" %}
 
-<body>
+{% block content %}
+<br>
+<br>
+<br>
+<br>
+<div id="chart"> </div>
 
-    <div id="chart"> </div>
+<!-- D3.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+<!-- jQuery.js -->
+<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+<!-- Plotly.js -->
+<script src="https://cdn.plot.ly/plotly-basic-latest.js"></script>
 
-</body>
+<script type="text/javascript">
 
-<footer>
-    <!-- D3.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
-    <!-- jQuery.js -->
-    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
-    <!-- Plotly.js -->
-    <script src="https://cdn.plot.ly/plotly-basic-latest.js"></script>
+    var graphs = {{graphJSON | safe}};
+    var layout = {
+        xaxis: {
+            title: {
+                text: 'x',
+            }
+        },
+        yaxis: {
+            title: {
+                text: 'GPD',
+            }
+        }
+    }
 
-    <script type="text/javascript">
+    Plotly.plot('chart', graphs, layout || {});
 
-        var graphs = {{graphJSON | safe}};
-
-        Plotly.plot('chart', graphs, {});
-
-    </script>
-</footer>
-</html>
+</script>
+{% endblock %}

@@ -17,7 +17,7 @@ def index():
 
         try:
             graphJSON = create_plot(model, xbj, t, q2)
-            return render_template('result.html', title='Result', graphJSON=graphJSON)
+            return render_template('result.html', title='Result', form=form, graphJSON=graphJSON)
 
         except:
             return "Error"
