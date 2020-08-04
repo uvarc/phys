@@ -9,10 +9,10 @@ Generate femtography plots below.
 <div class="formwrapper">
     <h3 class="title">Input parameters</h3>
     <form method="POST" action="/">
-        <div class="form-field">{{ form.csv.label }} {{ form.csv(size=20) }}
-            {% if form.csv.errors %}
+        <div class="form-field">{{ form.model.label }} {{ form.model(size=20) }}
+            {% if form.model.errors %}
                 <ul class="errors">
-                    {% for error in form.csv.errors %}
+                    {% for error in form.model.errors %}
                         <li>{{ error }}</li>
                     {% endfor %}
                 </ul>
@@ -47,5 +47,6 @@ Generate femtography plots below.
         </div>
         {{ form.submit }}
     </form>
+
 </div>
 {% endblock %}

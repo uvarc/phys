@@ -1,9 +1,34 @@
-{% extends "base.html" %}
+<!doctype html>
+<html lang="en">
+<head>
+    {% if title %}
+        <title>{{ title }}</title>
+    {% else %}
+        <title>Some Physics Project</title>
+    {% endif %}
+    <!<link rel="shortcut icon" href="{{ url_for('static', filename='bart_icon.png') }}">
+</head>
 
-{% block content %}
-    <h1>Results</h1>
-    <div class="py-3">
-        <h3><font color="#002F6C">Results</font></h3>
+<body>
 
-    </div>
-{% endblock %}
+    <div id="chart"> </div>
+
+</body>
+
+<footer>
+    <!-- D3.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.6/d3.min.js"></script>
+    <!-- jQuery.js -->
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <!-- Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-basic-latest.js"></script>
+
+    <script type="text/javascript">
+
+        var graphs = {{graphJSON | safe}};
+
+        Plotly.plot('chart', graphs, {});
+
+    </script>
+</footer>
+</html>
