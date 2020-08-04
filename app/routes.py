@@ -7,8 +7,7 @@ from mesh import create_plot
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
-    form = Form(request.form)
-    print(form.validate())
+    form = Form()
     if request.method == 'POST' and form.validate_on_submit():
         model = request.form['model']
         xbj = float(request.form['xbj'])
