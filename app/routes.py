@@ -25,9 +25,9 @@ def index():
     else:
         return render_template('index.html', title='Home', form=form)
 
-#@app.route('/result')
-#def result():
-    #return render_template('result.html', title='Result')
+@app.route('/result')
+def result():
+    return render_template('result.html', title='Result')
 
 @app.route('/help')
 def help():
