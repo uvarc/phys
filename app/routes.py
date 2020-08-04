@@ -1,7 +1,6 @@
 from flask import request, render_template, flash, redirect, url_for
 import plotly
 import plotly.graph_objects as go
-import json
 from form import Form
 from app import app
 from mesh import create_plot
