@@ -9,6 +9,7 @@ Generate femtography plots below.
 <div class="formwrapper">
     <h3 class="title">Input parameters</h3>
     <form method="POST" action="/">
+    {{ form.hidden_tag() }}
         <div class="form-field">{{ form.model.label }} {{ form.model }}
             {% if form.model.errors %}
                 <ul class="errors">
