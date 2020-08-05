@@ -13,17 +13,17 @@ class Form(FlaskForm):
     )
 
     xbj = DecimalField(
-        'xbj = ',
+        'xbj ',
         [NumberRange(min=0., max=1., message="Please set %(min)s <= xbj <= %(max)s"), InputRequired()]
     )
 
     t = DecimalField(
-        't = ',
+        't ',
         [NumberRange(min=-10., max=10., message="Please set %(min)s <= t <= %(max)s"), InputRequired()]
     )
 
     q2 = DecimalField(
-        'q2 = ',
+        'q2 ',
         [NumberRange(min=-10., max=100., message="Please set %(min)s <= q2 <= %(max)s"), InputRequired()]
     )
 

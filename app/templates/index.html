@@ -19,7 +19,8 @@ Generate femtography plots below.
                 </ul>
             {% endif %}
         </div>
-        <div class="form-field">{{ form.xbj.label }} {{ form.xbj }}
+        <div class="form-field">{{ form.xbj.label }} (min: ; max: ) <br>
+            {{ form.xbj }}
             {% if form.xbj.errors %}
                 <ul class="errors">
                     {% for error in form.xbj.errors %}
@@ -28,7 +29,8 @@ Generate femtography plots below.
                 </ul>
             {% endif %}
         </div>
-        <div class="form-field">{{ form.t.label }} {{ form.t }}
+        <div class="form-field">{{ form.t.label }} (min: ; max: ) <br>
+            {{ form.t }}
             {% if form.t.errors %}
                 <ul class="errors">
                     {% for error in form.t.errors %}
@@ -37,7 +39,8 @@ Generate femtography plots below.
                 </ul>
             {% endif %}
         </div>
-        <div class="form-field">{{ form.q2.label }} {{ form.q2 }}
+        <div class="form-field">{{ form.q2.label }} (min: ; max: ) <br>
+            {{ form.q2 }}
             {% if form.q2.errors %}
                 <ul class="errors">
                     {% for error in form.q2.errors %}
