@@ -1,16 +1,26 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Femtography Plotter</h1>
-Generate femtography plots below.
+<h1>Femtomesh GPD Plotter</h1>
+Generate Generalize Parton Distribution model plots.
 
 <hr>
-<h2>Run here</h2>
+<h2>Generalize Parton Distribution Models</h2>
 <div class="formwrapper">
-    <h3 class="title">Input parameters</h3>
+    <h3 class="title">Kinematic Parameters</h3>
     <form method="POST" action="/">
     {{ form.hidden_tag() }}
-        <div class="form-field">{{ form.model.label }} {{ form.model }}
+        <div class="form-field">{{ form.gpd_model.label }} {{ form.gpd_model }}
+            {% if form.gpd_model.errors %}
+                <ul class="errors">
+                    {% for error in form.gpd_model.errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+        <div class="form-field">{{ form.model.label }} <br>
+            {{ form.model }}
             {% if form.model.errors %}
                 <ul class="errors">
                     {% for error in form.model.errors %}

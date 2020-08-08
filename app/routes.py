@@ -10,12 +10,13 @@ def index():
     form = Form()
     if request.method == 'POST' and form.validate_on_submit():
         model = request.form['model']
+        gpd_model = request.form['gpd_model']
         xbj = float(request.form['xbj'])
         t   = float(request.form['t'])
         q2  = float(request.form['q2'])
 
         try:
-            graphJSON = create_plot(model, xbj, t, q2)
+            graphJSON = create_plot(model, gpd_model, xbj, t, q2)
             return render_template('result.html', title='Result', form=form, graphJSON=graphJSON)
 
         except:

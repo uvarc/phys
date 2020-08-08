@@ -1,26 +1,19 @@
 import plotly
 import plotly.graph_objects as go
 import femtomesh as fm
-import timeit
 import json
 
-def create_plot(model, xbj, t, q2):
-    start = timeit.default_timer()
 
-    if model == 'A':
-        csv_file = 'data/GPD_H.csv'
+def create_plot(model, gpd, xbj, t, q2):
+    csv_file = 'data/models/model_{model}/{gpd}'.format(model=model, gpd=gpd)
 
-    mesh     = fm.FemtoMesh(csv_file)
+    mesh = fm.FemtoMesh(csv_file)
     mesh.xbj = xbj
-    mesh.t   = t
-    mesh.q2  = q2
+    mesh.t = t
+    mesh.q2 = q2
 
     df = mesh.process()
-
-    stop = timeit.default_timer()
-    print('Time: ', stop - start)
-
-    #figure = go.Figure()
+    print(df)
 
     traces = {}
     traces['UP'] = go.Scatter(x=df.x,
@@ -36,5 +29,3 @@ def create_plot(model, xbj, t, q2):
     graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
 
     return graphJSON
-
-    #return dict(data=traces['UP'], layout=dict(xaxis={'title': 'x'}, yaxis={'title': 'GPD'}))

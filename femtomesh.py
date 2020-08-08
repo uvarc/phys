@@ -1,13 +1,15 @@
 import pandas as pd
 import numpy as np
 import bisect
+import os
 
 
 class FemtoMesh:
     def __init__(self, name):
-        self.data_frame = 0
+        self.data_frame = None
         self.data_frame_name = name
-        self.chunksize = 10000000
+        self.chunksize = 1000000
+        self.model_generated = False
 
         self._xbj = 0
         self._t = 0
@@ -15,12 +17,15 @@ class FemtoMesh:
 
     def build_data_frame(self, xbj, t):
         df_list = []
-        for chunk in pd.read_csv(self.data_frame_name, dtype=float, chunksize=self.chunksize):
-            df = chunk[(chunk.xbj == xbj) & (chunk.t == t)]
-            if df.empty:
-                pass
-            else:
-                df_list.append(df)
+        try:
+            for chunk in pd.read_csv(self.data_frame_name, dtype=float, chunksize=self.chunksize):
+                df = chunk[(chunk.xbj == xbj) & (chunk.t == t)]
+                if df.empty:
+                    pass
+                else:
+                    df_list.append(df)
+        except FileNotFoundError as ex:
+            print('{0}:{1} >\tFile not found.'.format(ex, __name__))
 
         return pd.concat(df_list)
 
@@ -71,6 +76,25 @@ class FemtoMesh:
         b = l_gpd - m * l_value
         return m * value + b
 
+    def model_to_csv(self, name):
+        try:
+            assert self.model_generated is True
+            self.data_frame.to_csv(name, index=False, header=['x', 'u', 'd', 'xu', 'xd'])
+        except AssertionError as ex:
+            print('Model {0} not saved. Returned {1}'.format(self.data_frame_name, ex))
+
+    @staticmethod
+    def model_search():
+        models = []
+        try:
+            models = os.listdir('./data/models/')
+            assert len(models) > 0, 'No models returned.'
+
+        except AssertionError as ex:
+            print('{0}:{1} >\tNo model files found.'.format(ex, __name__))
+
+        return models
+
     def process(self):
         x_value = np.array([])
         gpd_value_u = np.array([])
@@ -99,6 +123,9 @@ class FemtoMesh:
 
         d_frame['xu'] = d_frame['x'] * d_frame['u']
         d_frame['xd'] = d_frame['x'] * d_frame['d']
+
+        self.model_generated = True
+        self.data_frame = d_frame
 
         return d_frame
 
@@ -133,5 +160,8 @@ class FemtoMesh:
 
         d_frame['xu'] = d_frame['x'] * d_frame['u']
         d_frame['xd'] = d_frame['x'] * d_frame['d']
+
+        self.model_generated = True
+        self.data_frame = d_frame
 
         return d_frame

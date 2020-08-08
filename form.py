@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import SelectField, DecimalField, SubmitField
+from wtforms import SelectField, DecimalField, SubmitField, RadioField
 from wtforms.validators import InputRequired, NumberRange
 
 class Form(FlaskForm):
@@ -8,7 +8,16 @@ class Form(FlaskForm):
         'Select a model:',
         [InputRequired()],
         choices=[
-            ('A', 'A'),
+            ('uva', 'UVA Model'),
+            ('bkm', 'BKM Model')
+        ]
+    )
+
+    gpd_model = RadioField(
+        'GPD',
+        choices=[
+            ('GPD_E.csv','GPD_E'),
+            ('GPD_H.csv','GPD_H')
         ]
     )
 
