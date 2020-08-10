@@ -1,20 +1,25 @@
 from flask_wtf import FlaskForm
 from wtforms import SelectField, DecimalField, SubmitField, RadioField
 from wtforms.validators import InputRequired, NumberRange
+import femtomesh as fm
 
 class Form(FlaskForm):
     """Input parameters"""
+
+# search for model names
+    model_dirs = fm.FemtoMesh.model_search()
+    model_symbol = [m.split('_', 1)[1] for m in model_dirs]
+    model_descr = [m.upper() + ' Model' for m in model_symbol]
+
     model = SelectField(
         'Select a model:',
         [InputRequired()],
-        choices=[
-            ('uva', 'UVA Model'),
-            ('bkm', 'BKM Model')
-        ]
+        choices = zip(model_symbol, model_descr)
     )
 
     gpd_model = RadioField(
         'GPD',
+        [InputRequired()],
         choices=[
             ('GPD_E.csv','GPD_E'),
             ('GPD_H.csv','GPD_H')
