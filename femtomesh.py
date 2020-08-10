@@ -76,10 +76,10 @@ class FemtoMesh:
         b = l_gpd - m * l_value
         return m * value + b
 
-    def model_to_csv(self, name):
+    def model_to_csv(self):
         try:
             assert self.model_generated is True
-            self.data_frame.to_csv(name, index=False, header=['x', 'u', 'd', 'xu', 'xd'])
+            self.data_frame.to_csv("gpd_model.csv", index=False, header=['x', 'u', 'd', 'xu', 'xd'])
         except AssertionError as ex:
             print('Model {0} not saved. Returned {1}'.format(self.data_frame_name, ex))
 

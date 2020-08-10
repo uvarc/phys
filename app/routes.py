@@ -14,7 +14,7 @@ def index():
         xbj = float(request.form['xbj'])
         t   = float(request.form['t'])
         q2  = float(request.form['q2'])
-
+        print(model)
         try:
             graphJSON = create_plot(model, gpd_model, xbj, t, q2)
             return render_template('result.html', title='Result', form=form, graphJSON=graphJSON)
