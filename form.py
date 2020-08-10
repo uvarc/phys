@@ -8,13 +8,14 @@ class Form(FlaskForm):
 
 # search for model names
     model_dirs = fm.FemtoMesh.model_search()
-    model_symbol = [m.split('_', 1)[1] for m in model_dirs]
-    model_descr = [m.upper() + ' Model' for m in model_symbol]
+    model_choices = [
+        (m.split('_', 1)[1], m.split('_', 1)[1].upper() + ' Model' ) for m in model_dirs
+    ]
 
     model = SelectField(
         'Select a model:',
         [InputRequired()],
-        choices = zip(model_symbol, model_descr)
+        choices = model_choices
     )
 
     gpd_model = RadioField(
