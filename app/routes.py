@@ -1,11 +1,10 @@
-from flask import request, render_template, flash, redirect, url_for
+from flask import request, render_template, flash, redirect, url_for, Response
+import os
 import plotly
 import plotly.graph_objects as go
 from form import Form
 from app import app
 from mesh import create_plot
-import femtomesh
-import pandas
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
@@ -18,14 +17,13 @@ def index():
         q2  = float(request.form['q2'])
 
         try:
-            graphJSON, df = create_plot(model, gpd_model, xbj, t, q2)
+            graphJSON = create_plot(model, gpd_model, xbj, t, q2)
+
             if form.download.data:
-                resp = make_response(df.to_csv('gpd_model.csv', index=False, header=['x', 'u', 'd', 'xu', 'xd']))
-                resp.headers["Content-Disposition"] = "attachment; filename='gpd_model.csv'"
-                resp.headers["Content-Type"] = "text/csv"
-                print(resp)
-                return resp
+                return redirect('/download/gpd_model.csv')
+
             else:
+                #os.remove('download/gpd_model.csv')
                 return render_template('result.html', title='Result', form=form, graphJSON=graphJSON)
 
         except:
@@ -37,6 +35,18 @@ def index():
 @app.route('/result')
 def result():
     return render_template('result.html', title='Result')
+
+@app.route('/download/<filename>')
+def download(filename):
+    path = os.path.join('download', filename)
+    def generate():
+        with open(path) as f:
+            yield from f
+        os.remove(path)
+
+    resp = Response(generate(), mimetype='text/csv')
+    resp.headers.set('Content-Disposition', 'attachment', filename='gpd_model.csv')
+    return resp
 
 @app.route('/help')
 def help():

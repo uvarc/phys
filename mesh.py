@@ -12,6 +12,7 @@ def create_plot(model, gpd, xbj, t, q2):
     mesh.q2 = q2
 
     df = mesh.process()
+    df.to_csv('download/gpd_model.csv', index=False, header=['x', 'u', 'd', 'xu', 'xd'])
     print(df)
 
     traces = {}
@@ -27,4 +28,4 @@ def create_plot(model, gpd, xbj, t, q2):
     data = list(traces.values())
     graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
 
-    return graphJSON, df
+    return graphJSON
