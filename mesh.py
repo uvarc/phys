@@ -27,4 +27,4 @@ def create_plot(model, gpd, xbj, t, q2):
     data = list(traces.values())
     graphJSON = json.dumps(data, cls=plotly.utils.PlotlyJSONEncoder)
 
-    return graphJSON
+    return graphJSON, df

@@ -42,4 +42,6 @@ class Form(FlaskForm):
         [NumberRange(min=-10., max=100., message="Please set %(min)s <= q2 <= %(max)s"), InputRequired()]
     )
 
-    submit = SubmitField('Submit')
+    submit = SubmitField('Plot')
+
+    download = SubmitField('Download model as CSV')
