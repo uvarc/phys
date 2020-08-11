@@ -1,3 +1,5 @@
+import numpy
+import pandas
 import pandas as pd
 import numpy as np
 import bisect
@@ -18,15 +20,15 @@ class FemtoMesh:
         self._t = 0
         self._q2 = 0
 
-    def build_data_frame(self, xbj, t):
-        '''
+    def build_data_frame(self, xbj: 'float', t: 'float') -> 'pandas.DataFrame':
+        """
         Build PANDAS DataFrame from mesh csv. The mesh values are read in chucks keeping only
         the relevant data points to reduce the file size.
 
         xbj: x-bjorken
         t: proton momentum transfer
 
-        '''
+        """
         df_list = []
         try:
             for chunk in pd.read_csv(self.data_frame_name, dtype=float, chunksize=self.chunksize):
@@ -40,14 +42,14 @@ class FemtoMesh:
 
         return pd.concat(df_list)
 
-    def build_data_frame_heat(self, t):
-        '''
+    def build_data_frame_heat(self, t: 'float') -> 'pandas.DataFrame':
+        """
         Build PANDAS DataFrame from mesh csv. The mesh values are read in chucks keeping only
         the relevant data points to reduce the file size.
 
         t: proton momentum transfer
 
-        '''
+        """
 
         df_list = []
         for chunk in pd.read_csv(self.data_frame_name, dtype=float, chunksize=self.chunksize):
@@ -60,31 +62,31 @@ class FemtoMesh:
         return pd.concat(df_list)
 
     @property
-    def xbj(self):
+    def xbj(self) -> 'float':
         return self._xbj
 
     @xbj.setter
-    def xbj(self, xbj):
+    def xbj(self, xbj: 'float'):
         self._xbj = xbj
 
     @property
-    def t(self):
+    def t(self) -> 'float':
         return self._t
 
     @t.setter
-    def t(self, t):
+    def t(self, t: 'float'):
         self._t = t
 
     @property
-    def q2(self):
+    def q2(self) -> 'float':
         return self._q2
 
     @q2.setter
-    def q2(self, q2):
+    def q2(self, q2: 'float'):
         self._q2 = q2
 
     @staticmethod
-    def search(v, value):
+    def search(v: 'numpy.array', value: 'float') -> 'float, float':
         """
         Search for specific value in array v and return former and prior value in list.
 
@@ -96,7 +98,7 @@ class FemtoMesh:
         return v[i], v[i - 1]
 
     @staticmethod
-    def extrapolate(value, u_gpd, l_gpd, u_value, l_value):
+    def extrapolate(value: 'float', u_gpd: 'float', l_gpd: 'float', u_value: 'float', l_value: 'float') -> 'float':
         """
         Determine local relationship between Q2 and quark GPD values in a kinematic range; assumes a linear
         relationship. The slope and intercept are then used to determine the GPD value(s) at a Q2 of value.
@@ -123,7 +125,7 @@ class FemtoMesh:
             print('Model {0} not saved. Returned {1}'.format(self.data_frame_name, ex))
 
     @staticmethod
-    def model_search():
+    def model_search() -> 'list':
         """
         Search model directory for all listed GPD models and return list for selection on frontend.
         """
@@ -137,7 +139,7 @@ class FemtoMesh:
 
         return models
 
-    def process(self):
+    def process(self) -> 'pandas.DataFrame':
         """
         Process is the main worker function of Femtomesh. The method builds the model for a given kinematic
         region and then determines the UP and DOWN quark GPDs for every value of x at a given Q2. A new DataFrame
@@ -177,7 +179,7 @@ class FemtoMesh:
 
         return d_frame
 
-    def process_heat(self):
+    def process_heat(self) -> 'pandas.DataFrame':
         x_value = np.array([])
         xbj_value = np.array([])
         gpd_value_u = np.array([])
@@ -186,7 +188,7 @@ class FemtoMesh:
         dff = self.build_data_frame_heat(self.t)
 
         iters = [(i, j) for i in dff['x'].unique() for j in dff['xbj'].unique()]
-        total_elements = 0.5*len(list(chain.from_iterable(iters)))
+        total_elements = 0.5 * len(list(chain.from_iterable(iters)))
         progress_bar = tqdm(total=total_elements)
 
         for x, xbj in iters:
