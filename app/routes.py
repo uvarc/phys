@@ -23,7 +23,6 @@ def index():
                 return redirect('/download/gpd_model.csv')
 
             else:
-                #os.remove('download/gpd_model.csv')
                 return render_template('result.html', title='Result', form=form, graphJSON=graphJSON)
 
         except:

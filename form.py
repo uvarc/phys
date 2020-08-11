@@ -19,7 +19,7 @@ class Form(FlaskForm):
     )
 
     gpd_model = RadioField(
-        'GPD',
+        'Select GPD',
         [InputRequired()],
         choices=[
             ('GPD_E.csv','GPD_E'),
