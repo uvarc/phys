@@ -7,11 +7,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 RUN pip install --no-cache-dir uwsgi
 
-ARG APP=femtograph
-WORKDIR /$APP
-COPY . /$APP
+ARG app
+WORKDIR /app
+COPY . /app
 COPY nginx.conf /etc/nginx/sites-enabled/default
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-CMD service nginx start && uwsgi -s /tmp/uwsgi.sock --chmod-socket=666 --manage-script-name --mount /=$APP:$APP
+CMD service nginx start && uwsgi -s /tmp/uwsgi.sock --chmod-socket=666 --manage-script-name --mount /=app:app
