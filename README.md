@@ -11,5 +11,5 @@ Mesh search and plotting code for UVA-CNF group
     ```
     source venv/bin/activate
     pip install -r requirements.txt
-    python main.py
+    python app.py
     ```
