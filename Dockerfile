@@ -1,8 +1,8 @@
-FROM python:3.7.8-slim-buster
+FROM python:3.7.8-buster
 LABEL maintainer="UVA Research Computing <uvarc@virginia.edu>"
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        nginx && \
+        gcc nginx && \
     rm -rf /var/lib/apt/lists/*
 
 RUN pip install --no-cache-dir uwsgi
