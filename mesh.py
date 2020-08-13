@@ -2,6 +2,7 @@ import plotly
 import plotly.graph_objects as go
 import femtomesh as fm
 import json
+import time
 
 
 def create_plot(model, gpd, xbj, t, q2):
@@ -13,7 +14,6 @@ def create_plot(model, gpd, xbj, t, q2):
 
     df = mesh.process()
     df.to_csv('download/gpd_model.csv', index=False, header=['x', 'u', 'd', 'xu', 'xd'])
-    print(df)
 
     traces = {}
     traces['UP'] = go.Scatter(x=df.x,

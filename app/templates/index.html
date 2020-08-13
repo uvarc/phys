@@ -1,13 +1,11 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Femtomesh GPD Plotter</h1>
-Generate Generalize Parton Distribution model plots.
+<h1>Femtomesh GPD Model Plotting App</h1>
 
 <hr>
 <h2>Generalize Parton Distribution Models</h2>
 <div class="formwrapper">
-    <h3 class="title">Kinematic Parameters</h3>
     <form method="POST" action="/">
     {{ form.hidden_tag() }}
         <div class="form-field">{{ form.gpd_model.label }} {{ form.gpd_model }}
@@ -30,6 +28,7 @@ Generate Generalize Parton Distribution model plots.
             {% endif %}
         </div>
         <br>
+        <h3 class="title">Kinematic Parameters</h3>
         <div class="form-field">{{ form.xbj.label }} (min: ; max: ) <br>
             {{ form.xbj }}
             {% if form.xbj.errors %}
