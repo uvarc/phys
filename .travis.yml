@@ -12,7 +12,7 @@ before_install:
 install:
     docker build --no-cache -t uvarc/phys-femtography:latest . || exit 1;
     docker push uvarc/phys-femtography:latest || exit 1;
-    # aws sqs send-message --queue-url 'https://queue.amazonaws.com/474683445819/dcos-refresh' --message-body 'zanglab/bartweb.org' || exit 1;
+    aws sqs send-message --queue-url 'https://queue.amazonaws.com/474683445819/dcos-refresh' --message-body 'physics/femtography-web' || exit 1;
 
 notifications:
   email:
