@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 RUN pip install --no-cache-dir uwsgi
 
-ARG APP=femtographer
+ARG APP=femtograph
 WORKDIR /$APP
 COPY . /$APP
 COPY nginx.conf /etc/nginx/sites-enabled/default

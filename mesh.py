@@ -14,7 +14,6 @@ def create_plot(model, gpd, xbj, t, q2):
 
     df = mesh.process()
     df.to_csv('download/gpd_model.csv', index=False, header=['x', 'u', 'd', 'xu', 'xd'])
-    print('here')
 
     traces = {}
     traces['UP'] = go.Scatter(x=df.x,
