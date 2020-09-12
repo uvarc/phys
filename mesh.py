@@ -1,8 +1,9 @@
+import json
+
 import plotly
 import plotly.graph_objects as go
+
 import femtomesh as fm
-import json
-import time
 
 
 def create_plot(model, gpd, xbj, t, q2):
@@ -12,7 +13,9 @@ def create_plot(model, gpd, xbj, t, q2):
     mesh.t = t
     mesh.q2 = q2
 
-    df = mesh.process()
+    mesh.build_data_frame(xbj, t)
+    df = mesh.process(multiprocessing=True, dim=1)
+
     df.to_csv('download/gpd_model.csv', index=False, header=['x', 'u', 'd', 'xu', 'xd'])
 
     traces = {}

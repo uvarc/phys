@@ -4,13 +4,16 @@ import pandas as pd
 import numpy as np
 import bisect
 import os
+import multiprocessing as mp
 
 from tqdm import tqdm
 from itertools import chain
 
 
 class FemtoMesh:
+
     def __init__(self, name):
+
         self.data_frame = None
         self.data_frame_name = name
         self.chunksize = 1000000
@@ -40,26 +43,35 @@ class FemtoMesh:
         except FileNotFoundError as ex:
             print('{0}:{1} >\tFile not found.'.format(ex, __name__))
 
-        return pd.concat(df_list)
+        self.data_frame = pd.concat(df_list)
+        self.model_generated = True
 
-    def build_data_frame_heat(self, t: 'float') -> 'pandas.DataFrame':
+        return self.data_frame
+
+    def build_data_frame2D(self, t: 'float') -> 'pandas.DataFrame':
         """
         Build PANDAS DataFrame from mesh csv. The mesh values are read in chucks keeping only
         the relevant data points to reduce the file size.
 
         t: proton momentum transfer
-
         """
 
         df_list = []
-        for chunk in pd.read_csv(self.data_frame_name, dtype=float, chunksize=self.chunksize):
-            df = chunk[chunk.t == t]
-            if df.empty:
-                pass
-            else:
-                df_list.append(df)
+        try:
+            for chunk in pd.read_csv(self.data_frame_name, dtype=float, chunksize=self.chunksize):
+                df = chunk[chunk.t == t]
+                if df.empty:
+                    pass
+                else:
+                    df_list.append(df)
 
-        return pd.concat(df_list)
+            self.data_frame = pd.concat(df_list)
+            self.model_generated = True
+
+        except FileNotFoundError as ex:
+            print('{0}:{1} >\tFile not found.'.format(ex, __name__))
+
+        return self.data_frame
 
     @property
     def xbj(self) -> 'float':
@@ -139,8 +151,86 @@ class FemtoMesh:
 
         return models
 
-    def process(self) -> 'pandas.DataFrame':
+    @staticmethod
+    def parallelize(func, data_frame, cpu_count):
+        assert cpu_count <= mp.cpu_count()
+
+        n_splits = cpu_count
+        split = np.array_split(data_frame.x.unique(), n_splits)
+        pool = mp.Pool(n_splits)
+        df = pd.concat(pool.map(func, split))
+        pool.close()
+        pool.join()
+
+        return df
+
+    def turbo(self, x_vector: 'numpy.array') -> 'pandas.DataFrame':
         """
+        The main worker function of Femtomesh for 1-dimensional plots. The method builds the model for a given
+        kinematic region and then determines the UP and DOWN quark GPDs for every value of x at a given Q2. A
+        new DataFrame built containing the new information and returned to the user for plotting and analysis.
+        """
+        gpd_value_u = np.array([])
+        gpd_value_d = np.array([])
+
+        dff = self.data_frame
+        x_value = x_vector
+
+        for x in x_value:
+            sub_df = dff[dff.x == x][['Q2', 'gpd_u', 'gpd_d']]
+
+            upper, lower = self.search(sub_df.Q2.to_numpy(), self._q2)
+
+            df_upper = sub_df[sub_df.Q2 == upper][['gpd_u', 'gpd_d']]
+            df_lower = sub_df[sub_df.Q2 == lower][['gpd_u', 'gpd_d']]
+
+            gpd_upper_u = df_upper.gpd_u.iloc[0]
+            gpd_lower_u = df_lower.gpd_u.iloc[0]
+            gpd_upper_d = df_upper.gpd_d.iloc[0]
+            gpd_lower_d = df_lower.gpd_d.iloc[0]
+
+            gpd_value_u = np.append(gpd_value_u, self.extrapolate(self._q2, gpd_upper_u, gpd_lower_u, upper, lower))
+            gpd_value_d = np.append(gpd_value_d, self.extrapolate(self._q2, gpd_upper_d, gpd_lower_d, upper, lower))
+
+        d_frame = pd.DataFrame({'x': x_value,
+                                'u': gpd_value_u,
+                                'd': gpd_value_d})
+
+        d_frame['xu'] = d_frame['x'] * d_frame['u']
+        d_frame['xd'] = d_frame['x'] * d_frame['d']
+
+        self.data_frame = d_frame
+
+        return d_frame
+
+    def process(self, multiprocessing=False, cpu_count=4, dim=1):
+        """
+        Processes submitted job and determines which process should handle it.
+        """
+        try:
+            assert self.model_generated is True
+
+            if dim == 1:
+                if multiprocessing is True:
+                    df = self.parallelize(self.turbo, self.data_frame, cpu_count)
+                else:
+                    df = self.turbo(self.data_frame.x.unique())
+
+            else:
+                if multiprocessing is True:
+                    df = self.parallelize(self.turbo_2D, self.data_frame, cpu_count)
+                else:
+                    df = self.turbo_2D(self.data_frame.x.unique())
+
+            return df
+        except AssertionError as ex:
+            print('{0}:{1} Must build dataframe model before processing mesh search.'.format(__name__, ex))
+            raise
+
+    def _process(self) -> 'pandas.DataFrame':
+
+        """
+        !! [Deprecated] !!
         Process is the main worker function of Femtomesh. The method builds the model for a given kinematic
         region and then determines the UP and DOWN quark GPDs for every value of x at a given Q2. A new DataFrame
         built containing the new information and returned to the user for plotting and analysis.
@@ -148,11 +238,10 @@ class FemtoMesh:
         gpd_value_u = np.array([])
         gpd_value_d = np.array([])
 
-        dff = self.build_data_frame(self.xbj, self.t)
-        x_value = dff['x'].unique()
+        x_value = self.data_frame['x'].unique()
 
         for x in x_value:
-            sub_df = dff[dff.x == x][['Q2', 'gpd_u', 'gpd_d']]
+            sub_df = self.data_frame[self.data_frame.x == x][['Q2', 'gpd_u', 'gpd_d']]
 
             upper, lower = self.search(sub_df.Q2.to_numpy(), self._q2)
 
@@ -179,15 +268,40 @@ class FemtoMesh:
 
         return d_frame
 
+    def calculate_gpd_value(self, x, gpd):
+        gpd_value_u = np.array([])
+        gpd_value_d = np.array([])
+
+        sub_df = self.data_frame[self.data_frame.x == x][['Q2', gpd]]
+
+        upper, lower = self.search(sub_df.Q2.to_numpy(), self._q2)
+
+        df_upper = sub_df[sub_df.Q2 == upper][[gpd]]
+        df_lower = sub_df[sub_df.Q2 == lower][[gpd]]
+
+        gpd_upper_u = df_upper.gpd_u.iloc[0]
+        gpd_lower_u = df_lower.gpd_u.iloc[0]
+        gpd_upper_d = df_upper.gpd_d.iloc[0]
+        gpd_lower_d = df_lower.gpd_d.iloc[0]
+
+        gpd_value_u = np.append(gpd_value_u, self.extrapolate(self._q2, gpd_upper_u, gpd_lower_u, upper, lower))
+        gpd_value_d = np.append(gpd_value_d, self.extrapolate(self._q2, gpd_upper_d, gpd_lower_d, upper, lower))
+
+        return gpd_value_u, gpd_value_d
+
     def process_heat(self) -> 'pandas.DataFrame':
+        """
+        !!! [DEPRECATED] !!!
+        """
+
         x_value = np.array([])
         xbj_value = np.array([])
         gpd_value_u = np.array([])
         gpd_value_d = np.array([])
 
-        dff = self.build_data_frame_heat(self.t)
+        _df = self.data_frame
 
-        iters = [(i, j) for i in dff['x'].unique() for j in dff['xbj'].unique()]
+        iters = [(i, j) for i in _df['x'].unique() for j in _df['xbj'].unique()]
         total_elements = 0.5 * len(list(chain.from_iterable(iters)))
         progress_bar = tqdm(total=total_elements)
 
@@ -195,9 +309,57 @@ class FemtoMesh:
             x_value = np.append(x_value, x)
             xbj_value = np.append(xbj_value, xbj)
 
-            sub_df = dff[(dff.x == x) & (dff.xbj == xbj)][['Q2', 'gpd_u', 'gpd_d']]
+            sub_df = _df[(_df.x == x) & (_df.xbj == xbj)][['Q2', 'gpd_u', 'gpd_d']]
 
-            upper, lower = self.search(dff[(dff.x == x) & (dff.xbj == xbj)]['Q2'].to_numpy(), self._q2)
+            upper, lower = self.search(_df[(_df.x == x) & (_df.xbj == xbj)]['Q2'].to_numpy(), self._q2)
+
+            gpd_upper_u = sub_df[sub_df['Q2'] == upper]['gpd_u'].iloc[0]
+            gpd_lower_u = sub_df[sub_df['Q2'] == lower]['gpd_u'].iloc[0]
+            gpd_upper_d = sub_df[sub_df['Q2'] == upper]['gpd_d'].iloc[0]
+            gpd_lower_d = sub_df[sub_df['Q2'] == lower]['gpd_d'].iloc[0]
+
+            gpd_value_u = np.append(gpd_value_u, self.extrapolate(self._q2, gpd_upper_u, gpd_lower_u, upper, lower))
+            gpd_value_d = np.append(gpd_value_d, self.extrapolate(self._q2, gpd_upper_d, gpd_lower_d, upper, lower))
+            progress_bar.update(1)
+        progress_bar.close()
+
+        d_frame = pd.DataFrame({'x': x_value,
+                                'xbj': xbj_value,
+                                'u': gpd_value_u,
+                                'd': gpd_value_d})
+
+        d_frame['xu'] = d_frame['x'] * d_frame['u']
+        d_frame['xd'] = d_frame['x'] * d_frame['d']
+
+        self.model_generated = True
+        self.data_frame = d_frame
+
+        return d_frame
+
+    def turbo_2D(self, vector: 'numpy.array') -> 'pandas.DataFrame':
+        """
+        The main worker function of Femtomesh for 2-dimensional plots. The method builds the model for a given
+        kinematic region and then determines the UP and DOWN quark GPDs for every value of x at a given Q2. A
+        new DataFrame built containing the new information and returned to the user for plotting and analysis.
+        """
+        x_value = np.array([])
+        xbj_value = np.array([])
+        gpd_value_u = np.array([])
+        gpd_value_d = np.array([])
+
+        _df = self.data_frame
+
+        iters = [(i, j) for i in vector for j in _df['xbj'].unique()]
+        total_elements = 0.5 * len(list(chain.from_iterable(iters)))
+        progress_bar = tqdm(total=total_elements)
+
+        for x, xbj in iters:
+            x_value = np.append(x_value, x)
+            xbj_value = np.append(xbj_value, xbj)
+
+            sub_df = _df[(_df.x == x) & (_df.xbj == xbj)][['Q2', 'gpd_u', 'gpd_d']]
+
+            upper, lower = self.search(_df[(_df.x == x) & (_df.xbj == xbj)]['Q2'].to_numpy(), self._q2)
 
             gpd_upper_u = sub_df[sub_df['Q2'] == upper]['gpd_u'].iloc[0]
             gpd_lower_u = sub_df[sub_df['Q2'] == lower]['gpd_u'].iloc[0]

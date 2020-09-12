@@ -29,7 +29,7 @@
         </div>
         <br>
         <h3 class="title">Kinematic Parameters</h3>
-        <div class="form-field">{{ form.xbj.label }} (min: ; max: ) <br>
+        <div class="form-field">{{ form.xbj.label }} <br>
             {{ form.xbj }}
             {% if form.xbj.errors %}
                 <ul class="errors">
@@ -39,7 +39,7 @@
                 </ul>
             {% endif %}
         </div>
-        <div class="form-field">{{ form.t.label }} (min: ; max: ) <br>
+        <div class="form-field">{{ form.t.label }} <br>
             {{ form.t }}
             {% if form.t.errors %}
                 <ul class="errors">
@@ -49,7 +49,7 @@
                 </ul>
             {% endif %}
         </div>
-        <div class="form-field">{{ form.q2.label }} (min: ; max: ) <br>
+        <div class="form-field">{{ form.q2.label }} <br>
             {{ form.q2 }}
             {% if form.q2.errors %}
                 <ul class="errors">
@@ -60,7 +60,7 @@
             {% endif %}
         </div>
         <br>
-        {{ form.submit }} {{ form.download }}
+        {{ form.load }} {{ form.submit }} {{ form.download }}
     </form>
 </div>
 {% endblock %}
