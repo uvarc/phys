@@ -97,6 +97,15 @@ class FemtoMesh:
     def q2(self, q2: 'float'):
         self._q2 = q2
 
+    def get_xbj_list(self):
+        return self.data_frame.xbj.unique().to_numpy()
+
+    def get_x_list(self):
+        return self.data_frame.x.unique().to_numpy()
+
+    def get_t_list(self):
+        return self.data_frame.t.unique().to_numpy()
+
     @staticmethod
     def search(v: 'numpy.array', value: 'float') -> 'float, float':
         """
@@ -150,6 +159,7 @@ class FemtoMesh:
             print('{0}:{1} >\tNo model files found.'.format(ex, __name__))
 
         return models
+
 
     @staticmethod
     def parallelize(func, data_frame, cpu_count):

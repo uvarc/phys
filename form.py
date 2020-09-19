@@ -17,13 +17,13 @@ class Form(FlaskForm):
     ]
 
     model = SelectField(
-        'Select a model:',
+        'Select a model: ',
         [InputRequired()],
         choices=model_choices
     )
 
-    gpd_model = RadioField(
-        'Select GPD',
+    gpd_model = SelectField(
+        'Select GPD: ',
         [InputRequired()],
         choices=[
             ('GPD_E.csv', 'GPD_E'),

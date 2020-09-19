@@ -4,11 +4,11 @@
 <h1>FemtoNet GPD Model Plotting App</h1>
 
 <hr>
-<h2>Generalize Parton Distribution Models</h2>
 <div class="formwrapper">
     <form method="POST" action="/">
     {{ form.hidden_tag() }}
-        <div class="form-field">{{ form.gpd_model.label }} {{ form.gpd_model }}
+        <div class="form-field">{{ form.gpd_model.label }} <br>
+            {{ form.gpd_model }}
             {% if form.gpd_model.errors %}
                 <ul class="errors">
                     {% for error in form.gpd_model.errors %}
@@ -16,7 +16,7 @@
                     {% endfor %}
                 </ul>
             {% endif %}
-        </div>
+        </div> <br>
         <div class="form-field">{{ form.model.label }} <br>
             {{ form.model }}
             {% if form.model.errors %}
@@ -63,4 +63,6 @@
         {{ form.load }} {{ form.submit }} {{ form.download }}
     </form>
 </div>
+
+
 {% endblock %}
