@@ -1,67 +1,83 @@
 {% extends "base.html" %}
 
 {% block content %}
+<style>
+.borderexample {
+ border-style:solid;
+ border-color:#287EC7;
+}
+</style>
 <h1>FemtoNet GPD Model Plotting App</h1>
 
 <hr>
-<div class="formwrapper">
-    <form method="POST" action="/">
-    {{ form.hidden_tag() }}
-        <div class="form-field">{{ form.gpd_model.label }} <br>
-            {{ form.gpd_model }}
-            {% if form.gpd_model.errors %}
-                <ul class="errors">
-                    {% for error in form.gpd_model.errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        </div> <br>
-        <div class="form-field">{{ form.model.label }} <br>
-            {{ form.model }}
-            {% if form.model.errors %}
-                <ul class="errors">
-                    {% for error in form.model.errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
+<div class="row">
+    <div class="column">
+        <div class="formwrapper">
+            <form method="POST" action="/">
+            {{ form.hidden_tag() }}
+                <h3 class="title">Model</h3>
+                <div class="form-field">{{ form.gpd_model.label }} <br>
+                    {{ form.gpd_model }}
+                    {% if form.gpd_model.errors %}
+                        <ul class="errors">
+                            {% for error in form.gpd_model.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div> <br>
+                <div class="form-field">{{ form.model.label }} <br>
+                    {{ form.model }}
+                    {% if form.model.errors %}
+                        <ul class="errors">
+                            {% for error in form.model.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <br>
+                <h3 class="title">Kinematic Parameters</h3>
+                <div class="form-field">{{ form.xbj.label }} <br>
+                    {{ form.xbj }}
+                    {% if form.xbj.errors %}
+                        <ul class="errors">
+                            {% for error in form.xbj.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <div class="form-field">{{ form.t.label }} <br>
+                    {{ form.t }}
+                    {% if form.t.errors %}
+                        <ul class="errors">
+                            {% for error in form.t.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <div class="form-field">{{ form.q2.label }} <br>
+                    {{ form.q2 }}
+                    {% if form.q2.errors %}
+                        <ul class="errors">
+                            {% for error in form.q2.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+                <br>
+                {{ form.load }} {{ form.submit }} {{ form.download }}
+            </form>
         </div>
-        <br>
-        <h3 class="title">Kinematic Parameters</h3>
-        <div class="form-field">{{ form.xbj.label }} <br>
-            {{ form.xbj }}
-            {% if form.xbj.errors %}
-                <ul class="errors">
-                    {% for error in form.xbj.errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        </div>
-        <div class="form-field">{{ form.t.label }} <br>
-            {{ form.t }}
-            {% if form.t.errors %}
-                <ul class="errors">
-                    {% for error in form.t.errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        </div>
-        <div class="form-field">{{ form.q2.label }} <br>
-            {{ form.q2 }}
-            {% if form.q2.errors %}
-                <ul class="errors">
-                    {% for error in form.q2.errors %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-            {% endif %}
-        </div>
-        <br>
-        {{ form.load }} {{ form.submit }} {{ form.download }}
-    </form>
+    </div>
+    <div class="column">
+        <h3>Instructions</h3>
+        <p>Explanation of models</p>
+        <p>Explanation of kinematic parameters</p>
+    </div>
 </div>
 
 
