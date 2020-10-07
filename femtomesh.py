@@ -23,6 +23,11 @@ class FemtoMesh:
         self._t = 0
         self._q2 = 0
 
+    def open(self):
+
+        df = pd.read_csv(self.data_frame_name)
+        return df
+
     def build_data_frame(self, xbj: 'float', t: 'float') -> 'pandas.DataFrame':
         """
         Build PANDAS DataFrame from mesh csv. The mesh values are read in chucks keeping only
@@ -354,6 +359,7 @@ class FemtoMesh:
         """
         x_value = np.array([])
         xbj_value = np.array([])
+        q2 = np.array([])
         gpd_value_u = np.array([])
         gpd_value_d = np.array([])
 
@@ -366,6 +372,7 @@ class FemtoMesh:
         for x, xbj in iters:
             x_value = np.append(x_value, x)
             xbj_value = np.append(xbj_value, xbj)
+            q2 = np.append(q2, self._q2)
 
             sub_df = _df[(_df.x == x) & (_df.xbj == xbj)][['Q2', 'gpd_u', 'gpd_d']]
 
@@ -383,6 +390,7 @@ class FemtoMesh:
 
         d_frame = pd.DataFrame({'x': x_value,
                                 'xbj': xbj_value,
+                                'q2': q2,
                                 'u': gpd_value_u,
                                 'd': gpd_value_d})
 

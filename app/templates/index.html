@@ -6,6 +6,11 @@
  border-style:solid;
  border-color:#287EC7;
 }
+
+div {
+  padding: 2px 35px 1px 10px;
+}
+
 </style>
 <h1>FemtoNet GPD Model Plotting App</h1>
 
@@ -69,8 +74,64 @@
                     {% endif %}
                 </div>
                 <br>
-                {{ form.load }} {{ form.submit }} {{ form.download }}
+                {{ form.submit }} {{ form.download }}
             </form>
+
+            <script>
+                let model_select = document.getElementById('model');
+                let gpd_select = document.getElementById('gpd_model');
+
+                let xbj_select = document.getElementById('xbj');
+                let t_select = document.getElementById('t');
+
+                model_select.onchange = function(){
+                    model = model_select.value;
+                    gpd = gpd_select.value;
+
+                    fetch('/' + model + '/' + gpd).then(function(response){
+                        response.json().then(function(data) {
+                            let xbjHTML = '';
+                            let tHTML = '';
+                            let q2HTML = '';
+                            for (let k of data.kinematics){
+                                if(k.xbj){
+                                    xbjHTML += '<option value= "xbj">' + k.xbj + '</option>';
+                                }
+                                if(k.t){
+                                    tHTML += '<option value= "t">' + k.t + '</option>';
+                                }
+                            }
+                            xbj_select.innerHTML = xbjHTML;
+                            t_select.innerHTML = tHTML;
+                        });
+                    });
+
+                }
+
+                gpd_select.onchange = function(){
+                    model = model_select.value;
+                    gpd = gpd_select.value;
+
+                    fetch('/' + model + '/' + gpd).then(function(response){
+                        response.json().then(function(data) {
+                            let xbjHTML = '';
+                            let tHTML = '';
+                            for (let k of data.kinematics){
+                                if(k.xbj){
+                                    xbjHTML += '<option value= "xbj">' + k.xbj + '</option>';
+                                }
+                                if(k.t){
+                                    tHTML += '<option value= "t">' + k.t + '</option>';
+                                }
+                            }
+                            xbj_select.innerHTML = xbjHTML;
+                            t_select.innerHTML = tHTML;
+                        });
+                    });
+
+                }
+
+            </script>
         </div>
     </div>
     <div class="column">

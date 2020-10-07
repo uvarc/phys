@@ -1,6 +1,8 @@
 import os
+import itertools
+import femtomesh as fm
 
-from flask import request, render_template, redirect, Response
+from flask import request, render_template, redirect, Response, jsonify
 
 from app import app
 from form import Form
@@ -10,6 +12,10 @@ from mesh import create_plot
 @app.route('/', methods=['GET', 'POST'])
 def index():
     form = Form()
+    form.xbj.choices = [(round(0.0001*value,4)) for value in range(1, 20)]
+    form.t.choices = [(round(-0.1*value, 4)) for value in range(1, 20)]
+
+
     if request.method == 'POST' and form.validate_on_submit():
         model = request.form['model']
         gpd_model = request.form['gpd_model']
@@ -23,10 +29,6 @@ def index():
             if form.download.data:
                 return redirect('/download/gpd_model.csv')
 
-            elif form.load.data:
-                print('Loading model parameters.')
-                return render_template('index.html', title='Home', form=form)
-
             else:
                 return render_template('result.html', title='Result', form=form, graphJSON=graphJSON)
 
@@ -35,6 +37,27 @@ def index():
 
     else:
         return render_template('index.html', title='Home', form=form)
+
+@app.route('/<model>/<gpd>')
+def params(model=None, gpd=None):
+    df = fm.FemtoMesh('data/models/model_{0}/{1}.csv'.format(model, gpd)).open()
+
+    kinematics_array = []
+
+    for (xbj, t, q2) in list(itertools.zip_longest(df.xbj.unique(), df.t.unique(), df.Q2.unique())):
+        kinematics = {}
+        if xbj is not None:
+            kinematics['xbj'] = xbj
+        if t is not None:
+            kinematics['t'] = t
+        if q2 is not None:
+            kinematics['q2'] = q2
+
+        kinematics_array.append(kinematics)
+
+    return jsonify({'kinematics': kinematics_array})
+
+
 
 
 @app.route('/result')

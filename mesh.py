@@ -7,7 +7,7 @@ import femtomesh as fm
 
 
 def create_plot(model, gpd, xbj, t, q2):
-    csv_file = 'data/models/model_{model}/{gpd}'.format(model=model, gpd=gpd)
+    csv_file = 'data/models/model_{model}/{gpd}.csv'.format(model=model, gpd=gpd)
     mesh = fm.FemtoMesh(csv_file)
     mesh.xbj = xbj
     mesh.t = t
