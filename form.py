@@ -4,7 +4,6 @@ from wtforms.validators import InputRequired, NumberRange
 
 import femtomesh as fm
 
-
 class Form(FlaskForm):
     """Input parameters"""
 
@@ -32,13 +31,15 @@ class Form(FlaskForm):
     xbj = SelectField(
         'xbj',
         [InputRequired()],
-        choices=[]
+        choices=[],
+        validate_choice=True
     )
 
     t = SelectField(
         't',
         [InputRequired()],
-        choices=[]
+        choices=[],
+        validate_choice=True
     )
 
     q2 = DecimalField(

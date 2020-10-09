@@ -12,9 +12,8 @@ from mesh import create_plot
 @app.route('/', methods=['GET', 'POST'])
 def index():
     form = Form()
-    form.xbj.choices = [(round(0.0001*value,4)) for value in range(1, 20)]
-    form.t.choices = [(round(-0.1*value, 4)) for value in range(1, 20)]
-
+    form.xbj.choices = [(round(0.0001 * value, 4), round(0.0001 * value, 4)) for value in range(1, 20)]
+    form.t.choices = [(round(-0.1 * value, 4), round(-0.1 * value, 4)) for value in range(1, 20)]
 
     if request.method == 'POST' and form.validate_on_submit():
         model = request.form['model']
@@ -37,6 +36,7 @@ def index():
 
     else:
         return render_template('index.html', title='Home', form=form)
+
 
 @app.route('/<model>/<gpd>')
 def params(model=None, gpd=None):
