@@ -32,14 +32,16 @@ class Form(FlaskForm):
         'xbj',
         [InputRequired()],
         choices=[],
-        validate_choice=True
+        validate_choice=False,
+        coerce=float
     )
 
     t = SelectField(
         't',
         [InputRequired()],
         choices=[],
-        validate_choice=True
+        validate_choice=False,
+        coerce=float
     )
 
     q2 = DecimalField(

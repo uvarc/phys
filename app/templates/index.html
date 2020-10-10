@@ -8,7 +8,7 @@
 }
 
 div {
-  padding: 2px 35px 1px 10px;
+  padding: 2px 35px 1px 20px;
 }
 
 div_left {
@@ -17,12 +17,18 @@ div_left {
   background-color: #C8C8C8;
 }
 
+img {
+  max-width: 20%;
+  height: auto;
+}
+
 </style>
-<h1>FemtoNet GPD Model Plotting App</h1>
+<h2>FemtoNet GPD Model Plotting App</h2>
 
 <hr>
 <div class="row">
     <div_left class="column">
+
         <div class="formwrapper">
             <form method="POST" action="/">
             {{ form.hidden_tag() }}
@@ -103,10 +109,10 @@ div_left {
                             let q2HTML = '';
                             for (let k of data.kinematics){
                                 if(k.xbj){
-                                    xbjHTML += '<option value= "xbj">' + k.xbj + '</option>';
+                                    xbjHTML += '<option value= "' + k.xbj + '">' + k.xbj + '</option>';
                                 }
                                 if(k.t){
-                                    tHTML += '<option value= "t">' + k.t + '</option>';
+                                    tHTML += '<option value= "' + k.t + '">' + k.t + '</option>';
                                 }
                             }
                             xbj_select.innerHTML = xbjHTML;
@@ -126,10 +132,10 @@ div_left {
                             let tHTML = '';
                             for (let k of data.kinematics){
                                 if(k.xbj){
-                                    xbjHTML += '<option value= "xbj">' + k.xbj + '</option>';
+                                    xbjHTML += '<option value= "' + k.xbj + '">' + k.xbj + '</option>';
                                 }
                                 if(k.t){
-                                    tHTML += '<option value= "t">' + k.t + '</option>';
+                                    tHTML += '<option value= "' + k.t + '">' + k.t + '</option>';
                                 }
                             }
                             xbj_select.innerHTML = xbjHTML;
@@ -144,10 +150,20 @@ div_left {
     </div_left>
     <div class="column">
         <h3>Instructions</h3>
-        <p>Explanation of models</p>
-        <p>Explanation of kinematic parameters</p>
+        <ul>
+            <li>Pick the GPD of interest from the dropdown menu.</li>
+            <li> Pick the theoretical model.</li>
+        </ul>
+
+        <h3>Explanation of Kinematic Parameters</h3>
+        <ul>
+            <li> Choose kinematical parameters from the dropdown boxes. These <br>
+                are auto generated according to the gird points.</li>
+            <li> Choose Q2 values to estimate. </li>
+            <li> To download the results grid pick 'Download model as CSV' or <br>
+                press plot to generate interactive plot of the up(down) quark GPD versus x. </li>
+        </ul>
     </div>
 </div>
-
 
 {% endblock %}
