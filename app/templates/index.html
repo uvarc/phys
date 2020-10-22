@@ -55,7 +55,8 @@ img {
                 </div>
                 <br>
                 <h3 class="title">Kinematic Parameters</h3>
-                <div class="form-field">{{ form.xbj.label }} <br>
+                <div class="form-field">
+                    <label id="xbj_label">{{form.xbj.label}} </label> <br>
                     {{ form.xbj }}
                     {% if form.xbj.errors %}
                         <ul class="errors">
@@ -65,7 +66,8 @@ img {
                         </ul>
                     {% endif %}
                 </div>
-                <div class="form-field">{{ form.t.label }} <br>
+                <div class="form-field">
+                    <label id="t_label">{{form.t.label}} </label><br>
                     {{ form.t }}
                     {% if form.t.errors %}
                         <ul class="errors">
@@ -115,6 +117,12 @@ img {
                                     tHTML += '<option value= "' + k.t + '">' + k.t + '</option>';
                                 }
                             }
+                            document.getElementById('xbj_label')
+                            .innerHTML = 'xbj ('+data.model[0].xbj.min+' to '+data.model[0].xbj.max+')';
+
+                            document.getElementById('t_label')
+                            .innerHTML = 't ('+data.model[0].t.min+' to '+data.model[0].t.max+')';
+
                             xbj_select.innerHTML = xbjHTML;
                             t_select.innerHTML = tHTML;
                         });
@@ -163,6 +171,7 @@ img {
             <li> To download the results grid pick 'Download model as CSV' or <br>
                 press plot to generate interactive plot of the up(down) quark GPD versus x. </li>
         </ul>
+    </div>
     </div>
 </div>
 

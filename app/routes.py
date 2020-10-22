@@ -43,6 +43,17 @@ def params(model=None, gpd=None):
     df = fm.FemtoMesh('data/models/model_{0}/{1}.csv'.format(model, gpd)).open()
 
     kinematics_array = []
+    info = [{'name':model,
+            't': {
+                'max':df.t.max(),
+                'min':df.t.min()
+            },
+            'xbj': {
+                'max': df.xbj.max(),
+                'min': df.xbj.min()}
+             }
+            ]
+    print(df.Q2.max())
 
     for (xbj, t, q2) in list(itertools.zip_longest(df.xbj.unique(), df.t.unique(), df.Q2.unique())):
         kinematics = {}
@@ -55,7 +66,7 @@ def params(model=None, gpd=None):
 
         kinematics_array.append(kinematics)
 
-    return jsonify({'kinematics': kinematics_array})
+    return jsonify({'kinematics': kinematics_array,'model': info})
 
 
 
