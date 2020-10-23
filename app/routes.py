@@ -1,6 +1,7 @@
 import os
 import itertools
 import femtomesh as fm
+import json
 
 from flask import request, render_template, redirect, Response, jsonify
 
@@ -68,8 +69,30 @@ def params(model=None, gpd=None):
 
     return jsonify({'kinematics': kinematics_array,'model': info})
 
+@app.route('/api/<model>/<gpd>/<float:xbj>/<float(signed=True):t>/<float:q2>')
+def search(model='uva', gpd='GPD_H', xbj=None, t=None, q2=None):
+    print('Search values: {0} {1} {2} {3} {4}'.format(model, gpd, xbj, t, q2))
+    mesh = fm.FemtoMesh('data/models/model_{0}/{1}.csv'.format(model, gpd))
 
+    mesh.xbj = xbj
+    mesh.t = t
+    mesh.q2 = q2
 
+    try:
+        assert xbj is not None
+        assert t is not None
+        assert q2 is not None
+
+        mesh.build_data_frame(xbj, t)
+        df = mesh.process(multiprocessing=True, dim=1)
+
+    except AssertionError:
+        return "Assertion Error"
+
+    df.reset_index(inplace=True)
+    df = df.drop(columns=['index'])
+
+    return df.to_json(orient='index')
 
 @app.route('/result')
 def result():
