@@ -1,13 +1,12 @@
-import os
 import itertools
-import femtomesh as fm
-import json
+import os
 
 from flask import request, render_template, redirect, Response, jsonify
 
+import femtomesh as fm
 from app import app
 from form import Form
-from mesh import create_plot
+from meshplot import gpd_scatter_plot
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -22,7 +21,7 @@ def index():
         q2 = float(request.form['q2'])
 
         try:
-            graphJSON = create_plot(model, gpd_model, xbj, t, q2)
+            graphJSON = gpd_scatter_plot(model, gpd_model, xbj, t, q2)
 
             if form.download.data:
                 return redirect('/download/gpd_model.csv')
@@ -30,8 +29,8 @@ def index():
             else:
                 return render_template('result.html', title='Result', form=form, graphJSON=graphJSON)
 
-        except:
-            return "Error"
+        except Exception as ex:
+            return "{}: Unknown error.".format(ex)
 
     else:
         form.xbj.choices = [(round(0.0001 * value, 4), str(round(0.0001 * value, 4))) for value in range(1, 20)]
@@ -44,14 +43,14 @@ def params(model=None, gpd=None):
     df = fm.FemtoMesh('data/models/model_{0}/{1}.csv'.format(model, gpd)).open()
 
     kinematics_array = []
-    info = [{'name':model,
-            't': {
-                'max':df.t.max(),
-                'min':df.t.min()
-            },
-            'xbj': {
-                'max': df.xbj.max(),
-                'min': df.xbj.min()}
+    info = [{'name': model,
+             't': {
+                 'max': df.t.max(),
+                 'min': df.t.min()
+             },
+             'xbj': {
+                 'max': df.xbj.max(),
+                 'min': df.xbj.min()}
              }
             ]
     print(df.Q2.max())
@@ -67,11 +66,15 @@ def params(model=None, gpd=None):
 
         kinematics_array.append(kinematics)
 
-    return jsonify({'kinematics': kinematics_array,'model': info})
+    return jsonify({'kinematics': kinematics_array, 'model': info})
+
 
 @app.route('/api/<model>/<gpd>/<float:xbj>/<float(signed=True):t>/<float:q2>')
 def search(model='uva', gpd='GPD_H', xbj=None, t=None, q2=None):
-    print('Search values: {0} {1} {2} {3} {4}'.format(model, gpd, xbj, t, q2))
+    """
+        Search API
+    """
+
     mesh = fm.FemtoMesh('data/models/model_{0}/{1}.csv'.format(model, gpd))
 
     mesh.xbj = xbj
@@ -93,6 +96,7 @@ def search(model='uva', gpd='GPD_H', xbj=None, t=None, q2=None):
     df = df.drop(columns=['index'])
 
     return df.to_json(orient='index')
+
 
 @app.route('/result')
 def result():

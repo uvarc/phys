@@ -4,6 +4,7 @@ from wtforms.validators import InputRequired, NumberRange
 
 import femtomesh as fm
 
+
 class Form(FlaskForm):
     """Input parameters"""
 

@@ -1,10 +1,27 @@
 import redis
+import configparser
+
 from colorama import Fore
 
 
 class FemtoDB:
     def __init__(self, host='localhost', port=6379):
+        self.host = host
+        self.port = port
         self.db = redis.Redis(host=host, port=port)
+
+    def read_config(self):
+        """
+            Read configuration files and get database connection information.
+        """
+
+        config = configparser.ConfigParser()
+        if len(config.read('config/redis.config')) != 0:
+            connection = config['connection']
+            self.host = connection.get('host', fallback='localhost')
+            self.port = int(connection.get('port', fallback='6379'))
+        else:
+            print(Fore.RED + 'Local configuration file not found. Using defaults.' + Fore.WHITE)
 
     def get_model_list(self):
         """
@@ -17,7 +34,6 @@ class FemtoDB:
 
         return models
 
-
     def get_parameter_limits(self, model, parameter, dtype=float):
         """
             Get model parameter limits form database.
@@ -28,8 +44,37 @@ class FemtoDB:
 
         except Exception as ex:
             print(Fore.RED + '{}: Model does not exists in database.'.format(ex) + Fore.WHITE)
+            return
 
         return tuple(map(dtype, self.db.hget(model, parameter).decode().split(':')))
+
+    def get_parameter(self, model, parameter, dtype=str):
+        """
+            Get model parameter from database.
+        """
+        try:
+            if self.db.exists(model) == 0:
+                raise Exception('ModelException')
+
+        except Exception as ex:
+            print(Fore.RED + '{}: Model does not exists in database.'.format(ex) + Fore.WHITE)
+            return
+
+        return dtype(self.db.hget(model, parameter).decode())
+
+    def set_parameter(self, model, parameter, value, dtype=str):
+        """
+            Get model parameter from database.
+        """
+        try:
+            if self.db.exists(model) == 0:
+                raise Exception('ModelException')
+
+        except Exception as ex:
+            print(Fore.RED + '{}: Model does not exists in database.'.format(ex) + Fore.WHITE)
+            return
+
+        self.db.hset(model, parameter, dtype(value))
 
     def add_model(self, name=None, origin=None, xbj_limits=None, t_limits=None, q2_limits=None, model_dict=None):
         """
