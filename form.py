@@ -6,9 +6,13 @@ import femtomesh as fm
 
 
 class Form(FlaskForm):
-    """Input parameters"""
+    """
+    Form class defines the fields format of frontend site. Model list is pulled from either the local mesh model list
+    or from the Redis database.
 
-    # search for model names
+    Forms are prefilled with default values and ranges; they are modified at a later time once the model/gpd is selected.
+    """
+
     model_dirs = fm.FemtoMesh.model_search()
     model_choices = [
         (m.split('_', 1)[1], m.split('_', 1)[1].upper() + ' Model') for m in model_dirs

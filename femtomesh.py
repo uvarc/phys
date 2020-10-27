@@ -165,7 +165,6 @@ class FemtoMesh:
 
         return models
 
-
     @staticmethod
     def parallelize(func, data_frame, cpu_count):
         assert cpu_count <= mp.cpu_count()
@@ -242,47 +241,6 @@ class FemtoMesh:
             print('{0}:{1} Must build dataframe model before processing mesh search.'.format(__name__, ex))
             raise
 
-    def _process(self) -> 'pandas.DataFrame':
-
-        """
-        !! [Deprecated] !!
-        Process is the main worker function of Femtomesh. The method builds the model for a given kinematic
-        region and then determines the UP and DOWN quark GPDs for every value of x at a given Q2. A new DataFrame
-        built containing the new information and returned to the user for plotting and analysis.
-        """
-        gpd_value_u = np.array([])
-        gpd_value_d = np.array([])
-
-        x_value = self.data_frame['x'].unique()
-
-        for x in x_value:
-            sub_df = self.data_frame[self.data_frame.x == x][['Q2', 'gpd_u', 'gpd_d']]
-
-            upper, lower = self.search(sub_df.Q2.to_numpy(), self._q2)
-
-            df_upper = sub_df[sub_df.Q2 == upper][['gpd_u', 'gpd_d']]
-            df_lower = sub_df[sub_df.Q2 == lower][['gpd_u', 'gpd_d']]
-
-            gpd_upper_u = df_upper.gpd_u.iloc[0]
-            gpd_lower_u = df_lower.gpd_u.iloc[0]
-            gpd_upper_d = df_upper.gpd_d.iloc[0]
-            gpd_lower_d = df_lower.gpd_d.iloc[0]
-
-            gpd_value_u = np.append(gpd_value_u, self.extrapolate(self._q2, gpd_upper_u, gpd_lower_u, upper, lower))
-            gpd_value_d = np.append(gpd_value_d, self.extrapolate(self._q2, gpd_upper_d, gpd_lower_d, upper, lower))
-
-        d_frame = pd.DataFrame({'x': x_value,
-                                'u': gpd_value_u,
-                                'd': gpd_value_d})
-
-        d_frame['xu'] = d_frame['x'] * d_frame['u']
-        d_frame['xd'] = d_frame['x'] * d_frame['d']
-
-        self.model_generated = True
-        self.data_frame = d_frame
-
-        return d_frame
-
     def calculate_gpd_value(self, x, gpd):
         gpd_value_u = np.array([])
         gpd_value_d = np.array([])
@@ -303,53 +261,6 @@ class FemtoMesh:
         gpd_value_d = np.append(gpd_value_d, self.extrapolate(self._q2, gpd_upper_d, gpd_lower_d, upper, lower))
 
         return gpd_value_u, gpd_value_d
-
-    def process_heat(self) -> 'pandas.DataFrame':
-        """
-        !!! [DEPRECATED] !!!
-        """
-
-        x_value = np.array([])
-        xbj_value = np.array([])
-        gpd_value_u = np.array([])
-        gpd_value_d = np.array([])
-
-        _df = self.data_frame
-
-        iters = [(i, j) for i in _df['x'].unique() for j in _df['xbj'].unique()]
-        total_elements = 0.5 * len(list(chain.from_iterable(iters)))
-        progress_bar = tqdm(total=total_elements)
-
-        for x, xbj in iters:
-            x_value = np.append(x_value, x)
-            xbj_value = np.append(xbj_value, xbj)
-
-            sub_df = _df[(_df.x == x) & (_df.xbj == xbj)][['Q2', 'gpd_u', 'gpd_d']]
-
-            upper, lower = self.search(_df[(_df.x == x) & (_df.xbj == xbj)]['Q2'].to_numpy(), self._q2)
-
-            gpd_upper_u = sub_df[sub_df['Q2'] == upper]['gpd_u'].iloc[0]
-            gpd_lower_u = sub_df[sub_df['Q2'] == lower]['gpd_u'].iloc[0]
-            gpd_upper_d = sub_df[sub_df['Q2'] == upper]['gpd_d'].iloc[0]
-            gpd_lower_d = sub_df[sub_df['Q2'] == lower]['gpd_d'].iloc[0]
-
-            gpd_value_u = np.append(gpd_value_u, self.extrapolate(self._q2, gpd_upper_u, gpd_lower_u, upper, lower))
-            gpd_value_d = np.append(gpd_value_d, self.extrapolate(self._q2, gpd_upper_d, gpd_lower_d, upper, lower))
-            progress_bar.update(1)
-        progress_bar.close()
-
-        d_frame = pd.DataFrame({'x': x_value,
-                                'xbj': xbj_value,
-                                'u': gpd_value_u,
-                                'd': gpd_value_d})
-
-        d_frame['xu'] = d_frame['x'] * d_frame['u']
-        d_frame['xd'] = d_frame['x'] * d_frame['d']
-
-        self.model_generated = True
-        self.data_frame = d_frame
-
-        return d_frame
 
     def turbo_2D(self, vector: 'numpy.array') -> 'pandas.DataFrame':
         """

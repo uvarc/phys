@@ -72,7 +72,7 @@ def params(model=None, gpd=None):
 @app.route('/api/<model>/<gpd>/<float:xbj>/<float(signed=True):t>/<float:q2>')
 def search(model='uva', gpd='GPD_H', xbj=None, t=None, q2=None):
     """
-        Search API
+        Search API: This is used to query the GPD mesh search from the femto mesh site.
     """
 
     mesh = fm.FemtoMesh('data/models/model_{0}/{1}.csv'.format(model, gpd))
