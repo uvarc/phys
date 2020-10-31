@@ -1,6 +1,7 @@
 import redis
 import configparser
 
+from os import environ
 from colorama import Fore
 
 
@@ -8,11 +9,38 @@ class FemtoDB:
     def __init__(self, host='localhost', port=6379):
         self.host = host
         self.port = port
+        self.secret_key = None
         self.db = redis.Redis(host=host, port=port)
+
+    def connect(self):
+        """
+           Configure Redis database connection using local environment variable. This should be the default for live
+           running. If no environment variables are found, try using configuration file.
+        """
+        try:
+            assert environ.get('SECRET_KEY') is not None
+            assert environ.get('REDIS_HOST') is not None
+            assert environ.get('REDIS_PORT') is not None
+
+            self.secret_key = environ['SECRET_KEY']
+            self.host = environ['REDIS_HOST']
+            self.port = environ['REDIS_PORT']
+
+        except AssertionError:
+            print(Fore.BLUE + 'Database info not found in environment. Checking for configuration file.' + Fore.WHITE)
+
+            self.read_config()
 
     def read_config(self):
         """
-            Read configuration files and get database connection information.
+            Read configuration files and get database connection information. Configuration is determined by
+            one of a few sources:
+
+            1) Check local environment variables for configuration information.
+            2) Check for local configuration files.
+            3) Default to localhost and default port.
+
+            4) Fail to connect.
         """
 
         config = configparser.ConfigParser()
@@ -21,7 +49,7 @@ class FemtoDB:
             self.host = connection.get('host', fallback='localhost')
             self.port = int(connection.get('port', fallback='6379'))
         else:
-            print(Fore.RED + 'Local configuration file not found. Using defaults.' + Fore.WHITE)
+            print(Fore.BLUE + 'Local configuration file not found. Using defaults.' + Fore.WHITE)
 
     def get_model_list(self):
         """
