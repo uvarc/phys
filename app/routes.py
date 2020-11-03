@@ -95,7 +95,7 @@ def search(model='uva', gpd='GPD_H', xbj=None, t=None, q2=None):
     df.reset_index(inplace=True)
     df = df.drop(columns=['index'])
 
-    return df.to_json(orient='index')
+    return df.to_json(orient='records', index=True, indent=4)
 
 
 @app.route('/result')
