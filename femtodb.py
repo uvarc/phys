@@ -10,7 +10,7 @@ class FemtoDB:
         self.host = host
         self.port = port
         self.secret_key = None
-        self.db = redis.Redis(host=host, port=port)
+        self.connect()
 
     def connect(self):
         """
@@ -25,11 +25,13 @@ class FemtoDB:
             self.secret_key = environ['SECRET_KEY']
             self.host = environ['REDIS_HOST']
             self.port = environ['REDIS_PORT']
+            self.db = redis.Redis(host=self.host, port=self.port)
 
         except AssertionError:
             print(Fore.BLUE + 'Database info not found in environment. Checking for configuration file.' + Fore.WHITE)
 
             self.read_config()
+            self.db = redis.Redis(host=self.host, port=self.port)
 
     def read_config(self):
         """

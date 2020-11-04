@@ -1,9 +1,9 @@
 import itertools
 import os
+import femtomesh as fm
+import femtodb
 
 from flask import request, render_template, redirect, Response, jsonify
-
-import femtomesh as fm
 from app import app
 from form import Form
 from meshplot import gpd_scatter_plot
@@ -96,6 +96,13 @@ def search(model='uva', gpd='GPD_H', xbj=None, t=None, q2=None):
     df = df.drop(columns=['index'])
 
     return df.to_json(orient='records', index=True, indent=4)
+
+
+@app.route('/models')
+def models():
+    database = femtodb.FemtoDB()
+    model_list = database.get_model_list()
+    return jsonify({'models':model_list})
 
 
 @app.route('/result')
