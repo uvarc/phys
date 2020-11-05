@@ -25,7 +25,7 @@ class FemtoMesh:
 
     def open(self):
 
-        df = pd.read_csv(self.data_frame_name)
+        df = pd.read_csv(self.data_frame_name).dropna()
         return df
 
     def build_data_frame(self, xbj: 'float', t: 'float') -> 'pandas.DataFrame':
@@ -49,6 +49,7 @@ class FemtoMesh:
             print('{0}:{1} >\tFile not found.'.format(ex, __name__))
 
         self.data_frame = pd.concat(df_list)
+        self.data_frame.dropna()
         self.model_generated = True
 
         return self.data_frame
@@ -71,6 +72,7 @@ class FemtoMesh:
                     df_list.append(df)
 
             self.data_frame = pd.concat(df_list)
+            self.data_frame.dropna()
             self.model_generated = True
 
         except FileNotFoundError as ex:
