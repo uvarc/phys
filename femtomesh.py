@@ -168,6 +168,21 @@ class FemtoMesh:
         return models
 
     @staticmethod
+    def gpd_search(model: 'str') -> 'list':
+        """
+        Search model directory for all listed GPD files and return list for selection on frontend.
+        """
+        models = []
+        try:
+            models = os.listdir('./data/models/{}/'.format(model))
+            assert len(models) > 0, 'No GPD models returned.'
+
+        except AssertionError as ex:
+            print('{0}:{1} >\tNo GPD files found.'.format(ex, __name__))
+
+        return models
+
+    @staticmethod
     def parallelize(func, data_frame, cpu_count):
         assert cpu_count <= mp.cpu_count()
 
