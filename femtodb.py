@@ -1,4 +1,4 @@
-import redis
+import redis3 as redis
 import configparser
 
 from os import environ
