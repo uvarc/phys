@@ -18,6 +18,11 @@ class Form(FlaskForm):
         (m.split('_', 1)[1], m.split('_', 1)[1].upper() + ' Model') for m in model_dirs
     ]
 
+    gpds = fm.FemtoMesh.gpd_search('model_uva')
+    gpd_list = [
+        (gpd.split('.')[0], gpd.split('.')[0]) for gpd in gpds
+    ]
+
     model = SelectField(
         'Select a model: ',
         [InputRequired()],
@@ -27,10 +32,7 @@ class Form(FlaskForm):
     gpd_model = SelectField(
         'Select GPD: ',
         [InputRequired()],
-        choices=[
-            ('GPD_E', 'GPD_E'),
-            ('GPD_H', 'GPD_H')
-        ]
+        choices=gpd_list
     )
 
     xbj = SelectField(

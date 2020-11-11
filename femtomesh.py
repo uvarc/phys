@@ -25,7 +25,7 @@ class FemtoMesh:
 
     def open(self):
 
-        df = pd.read_csv(self.data_frame_name)
+        df = pd.read_csv(self.data_frame_name).dropna()
         return df
 
     def build_data_frame(self, xbj: 'float', t: 'float') -> 'pandas.DataFrame':
@@ -49,6 +49,7 @@ class FemtoMesh:
             print('{0}:{1} >\tFile not found.'.format(ex, __name__))
 
         self.data_frame = pd.concat(df_list)
+        self.data_frame.dropna()
         self.model_generated = True
 
         return self.data_frame
@@ -71,6 +72,7 @@ class FemtoMesh:
                     df_list.append(df)
 
             self.data_frame = pd.concat(df_list)
+            self.data_frame.dropna()
             self.model_generated = True
 
         except FileNotFoundError as ex:
@@ -162,6 +164,21 @@ class FemtoMesh:
 
         except AssertionError as ex:
             print('{0}:{1} >\tNo model files found.'.format(ex, __name__))
+
+        return models
+
+    @staticmethod
+    def gpd_search(model: 'str') -> 'list':
+        """
+        Search model directory for all listed GPD files and return list for selection on frontend.
+        """
+        models = []
+        try:
+            models = os.listdir('./data/models/{}/'.format(model))
+            assert len(models) > 0, 'No GPD models returned.'
+
+        except AssertionError as ex:
+            print('{0}:{1} >\tNo GPD files found.'.format(ex, __name__))
 
         return models
 
