@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/uvarc/phys.svg?branch=master)](https://travis-ci.com/uvarc/phys)
+![Docker Build CI for PHYS](https://github.com/uvarc/phys/workflows/Docker%20Build%20CI%20for%20PHYS/badge.svg)
 
 # Femtography Plotter
 
