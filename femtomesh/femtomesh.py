@@ -8,6 +8,7 @@ import multiprocessing as mp
 
 from tqdm import tqdm
 from itertools import chain
+from scipy import interpolate
 
 
 class FemtoMesh:
@@ -121,7 +122,13 @@ class FemtoMesh:
         value: value to search for in list
         v: list of possible values
         """
-        i = bisect.bisect_left(v, value)
+        try:
+            assert value < len(v)
+            assert value > 0
+            i = bisect.bisect_left(v, value)
+        except AssertionError as assertion:
+            print('{0}: The request values is outside of the range of available data.'.format(assertion))
+            raise
 
         return v[i], v[i - 1]
 
@@ -158,8 +165,9 @@ class FemtoMesh:
         Search model directory for all listed GPD models and return list for selection on frontend.
         """
         models = []
+
         try:
-            models = os.listdir('./data/models/')
+            models = os.listdir('./femtomesh/data/models/')
             assert len(models) > 0, 'No models returned.'
 
         except AssertionError as ex:
@@ -174,7 +182,7 @@ class FemtoMesh:
         """
         models = []
         try:
-            models = os.listdir('./data/models/{}/'.format(model))
+            models = os.listdir('./femtomesh/data/models/{}/'.format(model))
             assert len(models) > 0, 'No GPD models returned.'
 
         except AssertionError as ex:
@@ -195,7 +203,7 @@ class FemtoMesh:
 
         return df
 
-    def turbo(self, x_vector: 'numpy.array') -> 'pandas.DataFrame':
+    def grid_search(self, x_vector: 'numpy.array') -> 'pandas.DataFrame':
         """
         The main worker function of Femtomesh for 1-dimensional plots. The method builds the model for a given
         kinematic region and then determines the UP and DOWN quark GPDs for every value of x at a given Q2. A
@@ -210,18 +218,11 @@ class FemtoMesh:
         for x in x_value:
             sub_df = dff[dff.x == x][['Q2', 'gpd_u', 'gpd_d']]
 
-            upper, lower = self.search(sub_df.Q2.to_numpy(), self._q2)
+            gpd_representaion_u = interpolate.splrep(sub_df.Q2.to_numpy(), sub_df.gpd_u.to_numpy(), s=0)
+            gpd_representaion_d = interpolate.splrep(sub_df.Q2.to_numpy(), sub_df.gpd_d.to_numpy(), s=0)
 
-            df_upper = sub_df[sub_df.Q2 == upper][['gpd_u', 'gpd_d']]
-            df_lower = sub_df[sub_df.Q2 == lower][['gpd_u', 'gpd_d']]
-
-            gpd_upper_u = df_upper.gpd_u.iloc[0]
-            gpd_lower_u = df_lower.gpd_u.iloc[0]
-            gpd_upper_d = df_upper.gpd_d.iloc[0]
-            gpd_lower_d = df_lower.gpd_d.iloc[0]
-
-            gpd_value_u = np.append(gpd_value_u, self.extrapolate(self._q2, gpd_upper_u, gpd_lower_u, upper, lower))
-            gpd_value_d = np.append(gpd_value_d, self.extrapolate(self._q2, gpd_upper_d, gpd_lower_d, upper, lower))
+            gpd_value_u = np.append(gpd_value_u, interpolate.splev(self._q2, gpd_representaion_u, der=0))
+            gpd_value_d = np.append(gpd_value_d, interpolate.splev(self._q2, gpd_representaion_d, der=0))
 
         d_frame = pd.DataFrame({'x': x_value,
                                 'u': gpd_value_u,
@@ -243,43 +244,36 @@ class FemtoMesh:
 
             if dim == 1:
                 if multiprocessing is True:
-                    df = self.parallelize(self.turbo, self.data_frame, cpu_count)
+                    df = self.parallelize(self.grid_search, self.data_frame, cpu_count)
                 else:
-                    df = self.turbo(self.data_frame.x.unique())
+                    df = self.grid_search(self.data_frame.x.unique())
 
             else:
                 if multiprocessing is True:
-                    df = self.parallelize(self.turbo_2D, self.data_frame, cpu_count)
+                    df = self.parallelize(self.grid_search_2D, self.data_frame, cpu_count)
                 else:
-                    df = self.turbo_2D(self.data_frame.x.unique())
+                    df = self.grid_search_2D(self.data_frame.x.unique())
 
             return df
         except AssertionError as ex:
             print('{0}:{1} Must build dataframe model before processing mesh search.'.format(__name__, ex))
             raise
 
-    def calculate_gpd_value(self, x, gpd):
+    def calculate_gpd_value(self, x):
         gpd_value_u = np.array([])
         gpd_value_d = np.array([])
 
-        sub_df = self.data_frame[self.data_frame.x == x][['Q2', gpd]]
+        sub_df = self.data_frame[self.data_frame.x == x][['Q2', 'gpd_u', 'gpd_d']]
 
-        upper, lower = self.search(sub_df.Q2.to_numpy(), self._q2)
+        gpd_representaion_u = interpolate.splrep(sub_df.Q2.to_numpy(), sub_df.gpd_u.to_numpy(), s=0)
+        gpd_representaion_d = interpolate.splrep(sub_df.Q2.to_numpy(), sub_df.gpd_d.to_numpy(), s=0)
 
-        df_upper = sub_df[sub_df.Q2 == upper][[gpd]]
-        df_lower = sub_df[sub_df.Q2 == lower][[gpd]]
-
-        gpd_upper_u = df_upper.gpd_u.iloc[0]
-        gpd_lower_u = df_lower.gpd_u.iloc[0]
-        gpd_upper_d = df_upper.gpd_d.iloc[0]
-        gpd_lower_d = df_lower.gpd_d.iloc[0]
-
-        gpd_value_u = np.append(gpd_value_u, self.extrapolate(self._q2, gpd_upper_u, gpd_lower_u, upper, lower))
-        gpd_value_d = np.append(gpd_value_d, self.extrapolate(self._q2, gpd_upper_d, gpd_lower_d, upper, lower))
+        gpd_value_u = np.append(gpd_value_u, interpolate.splev(self._q2, gpd_representaion_u, der=0))
+        gpd_value_d = np.append(gpd_value_d, interpolate.splev(self._q2, gpd_representaion_d, der=0))
 
         return gpd_value_u, gpd_value_d
 
-    def turbo_2D(self, vector: 'numpy.array') -> 'pandas.DataFrame':
+    def grid_search_2D(self, vector: 'numpy.array') -> 'pandas.DataFrame':
         """
         The main worker function of Femtomesh for 2-dimensional plots. The method builds the model for a given
         kinematic region and then determines the UP and DOWN quark GPDs for every value of x at a given Q2. A
@@ -304,15 +298,11 @@ class FemtoMesh:
 
             sub_df = _df[(_df.x == x) & (_df.xbj == xbj)][['Q2', 'gpd_u', 'gpd_d']]
 
-            upper, lower = self.search(_df[(_df.x == x) & (_df.xbj == xbj)]['Q2'].to_numpy(), self._q2)
+            gpd_representaion_u = interpolate.splrep(sub_df.Q2.to_numpy(), sub_df.gpd_u.to_numpy(), s=0)
+            gpd_representaion_d = interpolate.splrep(sub_df.Q2.to_numpy(), sub_df.gpd_d.to_numpy(), s=0)
 
-            gpd_upper_u = sub_df[sub_df['Q2'] == upper]['gpd_u'].iloc[0]
-            gpd_lower_u = sub_df[sub_df['Q2'] == lower]['gpd_u'].iloc[0]
-            gpd_upper_d = sub_df[sub_df['Q2'] == upper]['gpd_d'].iloc[0]
-            gpd_lower_d = sub_df[sub_df['Q2'] == lower]['gpd_d'].iloc[0]
-
-            gpd_value_u = np.append(gpd_value_u, self.extrapolate(self._q2, gpd_upper_u, gpd_lower_u, upper, lower))
-            gpd_value_d = np.append(gpd_value_d, self.extrapolate(self._q2, gpd_upper_d, gpd_lower_d, upper, lower))
+            gpd_value_u = np.append(gpd_value_u, interpolate.splev(self._q2, gpd_representaion_u, der=0))
+            gpd_value_d = np.append(gpd_value_d, interpolate.splev(self._q2, gpd_representaion_d, der=0))
             progress_bar.update(1)
         progress_bar.close()
 

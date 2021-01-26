@@ -1,12 +1,12 @@
 import itertools
 import os
-import femtomesh as fm
+from femtomesh import femtomesh as fm
 import femtodb
 
 from flask import request, render_template, redirect, Response, jsonify
 from app import app
 from form import Form
-from meshplot import gpd_scatter_plot
+from tools.meshplot import gpd_scatter_plot
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -40,7 +40,7 @@ def index():
 
 @app.route('/<model>/<gpd>')
 def params(model=None, gpd=None):
-    df = fm.FemtoMesh('data/models/model_{0}/{1}.csv'.format(model, gpd)).open()
+    df = fm.FemtoMesh('femtomesh/data/models/model_{0}/{1}.csv'.format(model, gpd)).open()
 
     kinematics_array = []
     info = [{'name': model,
@@ -50,10 +50,10 @@ def params(model=None, gpd=None):
              },
              'xbj': {
                  'max': df.xbj.max(),
-                 'min': df.xbj.min()}
+                 'min': df.xbj.min()
+             }
              }
             ]
-    print(df.Q2.max())
 
     for (xbj, t, q2) in list(itertools.zip_longest(df.xbj.unique(), df.t.unique(), df.Q2.unique())):
         kinematics = {}
@@ -75,7 +75,7 @@ def search(model='uva', gpd='GPD_H', xbj=None, t=None, q2=None):
         Search API: This is used to query the GPD mesh search from the femto mesh site.
     """
 
-    mesh = fm.FemtoMesh('data/models/model_{0}/{1}.csv'.format(model, gpd))
+    mesh = fm.FemtoMesh('femtomesh/data/models/model_{0}/{1}.csv'.format(model, gpd))
 
     mesh.xbj = xbj
     mesh.t = t
@@ -102,7 +102,7 @@ def search(model='uva', gpd='GPD_H', xbj=None, t=None, q2=None):
 def models():
     database = femtodb.FemtoDB()
     model_list = database.get_model_list()
-    return jsonify({'models':model_list})
+    return jsonify({'models': model_list})
 
 
 @app.route('/result')

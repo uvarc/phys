@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import SelectField, DecimalField, SubmitField
 from wtforms.validators import InputRequired, NumberRange
 
-import femtomesh as fm
+import femtomesh.femtomesh as fm
 
 
 class Form(FlaskForm):
@@ -10,7 +10,8 @@ class Form(FlaskForm):
     Form class defines the fields format of frontend site. Model list is pulled from either the local mesh model list
     or from the Redis database.
 
-    Forms are prefilled with default values and ranges; they are modified at a later time once the model/gpd is selected.
+    Forms are prefilled with default values and ranges; they are modified at a later time once the model/gpd is
+    selected.
     """
 
     model_dirs = fm.FemtoMesh.model_search()
@@ -53,7 +54,7 @@ class Form(FlaskForm):
 
     q2 = DecimalField(
         'q2 ',
-        [NumberRange(min=0., max=10., message="Please set Q2"), InputRequired()]
+        [NumberRange(min=1e-4, max=10., message="Please set Q2"), InputRequired()]
     )
 
     submit = SubmitField('Plot')

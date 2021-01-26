@@ -3,11 +3,11 @@ import json
 import plotly
 import plotly.graph_objects as go
 
-import femtomesh as fm
+import femtomesh.femtomesh as fm
 
 
 def gpd_scatter_plot(model, gpd, xbj, t, q2):
-    csv_file = 'data/models/model_{model}/{gpd}.csv'.format(model=model, gpd=gpd)
+    csv_file = 'femtomesh/data/models/model_{model}/{gpd}.csv'.format(model=model, gpd=gpd)
     mesh = fm.FemtoMesh(csv_file)
     mesh.xbj = xbj
     mesh.t = t
