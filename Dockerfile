@@ -2,7 +2,7 @@ FROM python:3.8.8-slim-buster
 LABEL maintainer="UVA Research Computing <uvarc@virginia.edu>"
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        gcc nginx && \
+        gcc libstdc++-8-dev nginx && \
     rm -rf /var/lib/apt/lists/*
 
 RUN pip install --no-cache-dir uwsgi
