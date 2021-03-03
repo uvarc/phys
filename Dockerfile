@@ -1,4 +1,4 @@
-FROM python:3.7.8-buster
+FROM python:3.8.8-slim-buster
 LABEL maintainer="UVA Research Computing <uvarc@virginia.edu>"
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
