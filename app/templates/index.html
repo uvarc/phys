@@ -108,7 +108,7 @@ img {
                     model = model_select.value;
                     gpd = gpd_select.value;
 
-                    fetch('/' + model + '/' + gpd).then(function(response){
+                    fetch('/api/' + model + '/' + gpd).then(function(response){
                         response.json().then(function(data) {
                             let xbjHTML = '';
                             let tHTML = '';
@@ -138,7 +138,7 @@ img {
                     model = model_select.value;
                     gpd = gpd_select.value;
 
-                    fetch('/' + model + '/' + gpd).then(function(response){
+                    fetch('/api/' + model + '/' + gpd).then(function(response){
                         response.json().then(function(data) {
                             let xbjHTML = '';
                             let tHTML = '';
